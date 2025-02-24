@@ -6,25 +6,25 @@ class DataManager:
     def __init__(self):
         self.data_dir = "data"
         self.ensure_data_files()
-        
+
     def ensure_data_files(self):
         """Create data files if they don't exist"""
         if not os.path.exists(self.data_dir):
             os.makedirs(self.data_dir)
-            
+
         # Create sales.csv if it doesn't exist
         if not os.path.exists(f"{self.data_dir}/sales.csv"):
             pd.DataFrame(columns=[
                 'date', 'customer_name', 'phone', 'item', 'price', 'payment_method'
             ]).to_csv(f"{self.data_dir}/sales.csv", index=False)
-            
+
         # Create repairs.csv if it doesn't exist
         if not os.path.exists(f"{self.data_dir}/repairs.csv"):
             pd.DataFrame(columns=[
                 'date', 'customer_name', 'phone', 'device', 'issue', 'status',
                 'estimated_cost', 'completion_date'
             ]).to_csv(f"{self.data_dir}/repairs.csv", index=False)
-            
+
         # Create inventory.csv if it doesn't exist
         if not os.path.exists(f"{self.data_dir}/inventory.csv"):
             pd.DataFrame(columns=[
@@ -37,7 +37,9 @@ class DataManager:
     def add_sale(self, sale_data):
         sales_df = self.get_sales()
         sale_data['date'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        sales_df = sales_df.append(sale_data, ignore_index=True)
+        # Convert sale_data dict to DataFrame and concatenate
+        new_sale_df = pd.DataFrame([sale_data])
+        sales_df = pd.concat([sales_df, new_sale_df], ignore_index=True)
         sales_df.to_csv(f"{self.data_dir}/sales.csv", index=False)
 
     def get_repairs(self):
@@ -46,7 +48,9 @@ class DataManager:
     def add_repair(self, repair_data):
         repairs_df = self.get_repairs()
         repair_data['date'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        repairs_df = repairs_df.append(repair_data, ignore_index=True)
+        # Convert repair_data dict to DataFrame and concatenate
+        new_repair_df = pd.DataFrame([repair_data])
+        repairs_df = pd.concat([repairs_df, new_repair_df], ignore_index=True)
         repairs_df.to_csv(f"{self.data_dir}/repairs.csv", index=False)
 
     def update_repair_status(self, index, status):
