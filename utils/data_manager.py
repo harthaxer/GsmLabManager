@@ -21,7 +21,7 @@ class DataManager:
         # Create repairs.csv if it doesn't exist
         if not os.path.exists(f"{self.data_dir}/repairs.csv"):
             pd.DataFrame(columns=[
-                'date', 'customer_name', 'phone', 'device', 'issue', 'status',
+                'date', 'customer_name', 'phone', 'device', 'category', 'issue', 'status',
                 'estimated_cost', 'completion_date'
             ]).to_csv(f"{self.data_dir}/repairs.csv", index=False)
 
