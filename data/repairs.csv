@@ -6,3 +6,4 @@ date,customer_name,phone,device,issue,status,estimated_cost,completion_date,cate
 2024-01-16 15:30:00,Natasha Rom,1234567899,iPhone 13,Speaker Not Working,Ready for Pickup,149.99,,
 2025-02-24 00:56:19,jon,111222333,nokia 106 ta-1174,charging connector or ringer will change.,Pending,0.0,,
 2025-02-24 01:02:51,jon,111222333,nokia 106,fully dead some short and not power on.,Pending,500.0,,Water Damage
+2025-02-24 01:05:33,jon,11220033,nokia 105,change lcd,Pending,500.0,,Screen Repair
