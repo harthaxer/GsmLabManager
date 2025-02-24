@@ -92,9 +92,13 @@ with tab2:
     for idx, repair in active_repairs.iterrows():
         # Create a colored container for each repair ticket
         with st.container():
-            # Use the category color as accent
-            category = repair.get('category', 'Other')
+            # Get category with fallback to 'Other' if not present
+            category = 'Other'
+            if 'category' in repair and pd.notna(repair['category']):
+                category = repair['category']
+
             accent_color = REPAIR_CATEGORIES[category]['color']
+            category_icon = REPAIR_CATEGORIES[category]['icon']
 
             st.markdown(
                 f"""
@@ -105,7 +109,7 @@ with tab2:
                     background-color: #F0F2F6;
                     border-radius: 5px;
                 ">
-                    <h3>{REPAIR_CATEGORIES[category]['icon']} {repair['customer_name']} - {repair['device']}</h3>
+                    <h3>{category_icon} {repair['customer_name']} - {repair['device']}</h3>
                 </div>
                 """,
                 unsafe_allow_html=True
