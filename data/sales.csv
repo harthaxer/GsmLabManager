@@ -1,0 +1,6 @@
+date,customer_name,phone,item,price,payment_method
+2024-01-15 09:30:00,John Smith,+1234567890,iPhone 13 Screen,149.99,Cash
+2024-01-15 11:45:00,Mary Johnson,+1234567891,Samsung S21 Battery,79.99,Card
+2024-01-15 14:20:00,James Brown,+1234567892,Phone Case,29.99,Mobile Payment
+2024-01-16 10:15:00,Sarah Wilson,+1234567893,Screen Protector,19.99,Cash
+2024-01-16 13:30:00,Michael Davis,+1234567894,Charging Cable,24.99,Card
