@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+import os
 
 st.title("🔧 Repair Management")
 
@@ -26,8 +27,10 @@ with tab1:
         col1, col2 = st.columns(2)
         with col1:
             customer_name = st.text_input("Customer Name")
-        with col2:
             phone = st.text_input("Phone Number")
+        with col2:
+            # Add camera input
+            camera_photo = st.camera_input("Take Customer Photo")
 
         # Device Information
         st.subheader("📱 Device Information")
@@ -57,6 +60,14 @@ with tab1:
 
         if submit_button:
             if customer_name and phone and device and issue:
+                # Process photo if available
+                photo_path = None
+                if camera_photo:
+                    photo_path = st.session_state.data_manager.save_customer_photo(
+                        camera_photo.getvalue(),
+                        customer_name
+                    )
+
                 repair_data = {
                     'customer_name': customer_name,
                     'phone': phone,
@@ -65,7 +76,8 @@ with tab1:
                     'issue': issue,
                     'estimated_cost': estimated_cost,
                     'status': 'Pending',
-                    'completion_date': None
+                    'completion_date': None,
+                    'photo_path': photo_path
                 }
                 st.session_state.data_manager.add_repair(repair_data)
                 st.success("✅ Repair ticket created successfully!")
@@ -116,6 +128,16 @@ with tab2:
                     unsafe_allow_html=True
                 )
 
+                # Display customer photo if available
+                if 'photo_path' in repair and pd.notna(repair['photo_path']):
+                    photo_data = st.session_state.data_manager.get_photo_as_base64(repair['photo_path'])
+                    if photo_data:
+                        st.markdown(f"""
+                            <img src="data:image/jpeg;base64,{photo_data}"
+                                style="width: 150px; border-radius: 10px; margin: 10px 0;"
+                            />
+                        """, unsafe_allow_html=True)
+
                 # Edit mode toggle
                 edit_mode = st.toggle("Edit Ticket", key=f"edit_{idx}")
 
@@ -141,10 +163,21 @@ with tab2:
                                 key=f"status_{idx}"
                             )
 
+                        # Option to take a new photo
+                        new_photo = st.camera_input("Update Customer Photo")
+
                         updated_issue = st.text_area("Issue Description", repair['issue'])
                         updated_cost = st.number_input("Estimated Cost", min_value=0.0, value=float(repair['estimated_cost']), format="%.2f")
 
                         if st.form_submit_button("Save Changes"):
+                            # Process new photo if taken
+                            photo_path = repair['photo_path']
+                            if new_photo:
+                                photo_path = st.session_state.data_manager.save_customer_photo(
+                                    new_photo.getvalue(),
+                                    updated_name
+                                )
+
                             # Update the repair in the DataFrame
                             repairs_df.loc[idx, 'customer_name'] = updated_name
                             repairs_df.loc[idx, 'phone'] = updated_phone
@@ -153,6 +186,7 @@ with tab2:
                             repairs_df.loc[idx, 'issue'] = updated_issue
                             repairs_df.loc[idx, 'estimated_cost'] = updated_cost
                             repairs_df.loc[idx, 'status'] = updated_status
+                            repairs_df.loc[idx, 'photo_path'] = photo_path
 
                             if updated_status == "Completed" and repair['status'] != "Completed":
                                 repairs_df.loc[idx, 'completion_date'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

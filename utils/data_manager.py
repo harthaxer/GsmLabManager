@@ -1,16 +1,21 @@
 import pandas as pd
 import os
 from datetime import datetime
+import base64
 
 class DataManager:
     def __init__(self):
         self.data_dir = "data"
+        self.photos_dir = os.path.join(self.data_dir, "customer_photos")
         self.ensure_data_files()
 
     def ensure_data_files(self):
-        """Create data files if they don't exist"""
+        """Create data files and directories if they don't exist"""
         if not os.path.exists(self.data_dir):
             os.makedirs(self.data_dir)
+
+        if not os.path.exists(self.photos_dir):
+            os.makedirs(self.photos_dir)
 
         # Create sales.csv if it doesn't exist
         if not os.path.exists(f"{self.data_dir}/sales.csv"):
@@ -22,7 +27,7 @@ class DataManager:
         if not os.path.exists(f"{self.data_dir}/repairs.csv"):
             pd.DataFrame(columns=[
                 'date', 'customer_name', 'phone', 'device', 'category', 'issue', 'status',
-                'estimated_cost', 'completion_date'
+                'estimated_cost', 'completion_date', 'photo_path'
             ]).to_csv(f"{self.data_dir}/repairs.csv", index=False)
 
         # Create inventory.csv if it doesn't exist
@@ -30,6 +35,25 @@ class DataManager:
             pd.DataFrame(columns=[
                 'item_name', 'quantity', 'price', 'threshold'
             ]).to_csv(f"{self.data_dir}/inventory.csv", index=False)
+
+    def save_customer_photo(self, photo_bytes, customer_name):
+        """Save customer photo and return the file path"""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        safe_name = "".join(x for x in customer_name if x.isalnum())
+        filename = f"{safe_name}_{timestamp}.jpg"
+        filepath = os.path.join(self.photos_dir, filename)
+
+        with open(filepath, "wb") as f:
+            f.write(photo_bytes)
+
+        return filepath
+
+    def get_photo_as_base64(self, photo_path):
+        """Convert photo to base64 for display"""
+        if photo_path and os.path.exists(photo_path):
+            with open(photo_path, "rb") as f:
+                return base64.b64encode(f.read()).decode()
+        return None
 
     def get_sales(self):
         return pd.read_csv(f"{self.data_dir}/sales.csv")
